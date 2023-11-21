@@ -68,7 +68,6 @@ public class GameScreen extends JPanel {
 				timerLbl.setText(String.format("%02d:%02d ", minutes, seconds));
 			}
 		});
-		timer.start();// Start the timer when the program starts.
 
 		// timer.stop();
 		// TODO End timer when all tiles matched.
@@ -149,5 +148,13 @@ public class GameScreen extends JPanel {
 		timerLbl.setBackground(SportsMatch.purple);
 		timerLbl.setOpaque(true);
 		return timerLbl;
+	}
+	
+	/**
+	 * Starts the timer. 
+	 * Used in MainScreen when contentPane swaps to GameScreen.
+	 */
+	public void startTimer() {
+		timer.start();// Start the timer when the program starts.
 	}
 }

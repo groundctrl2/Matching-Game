@@ -1,4 +1,5 @@
 package sportsMatch;
+
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
@@ -18,10 +19,10 @@ public class SportsMatch extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	CardLayout cardLayout = new CardLayout();
-	JPanel mainScreen = new MainScreen(this);//SportsMatch parameter provides cardLayout swap functionality.
 	JPanel gameScreen = new GameScreen(this);
-	
-	//Colors and Fonts
+	JPanel mainScreen = new MainScreen(this, gameScreen);
+
+	// Colors and Fonts
 	static Color purple = new Color(61, 65, 118);
 	static Color gold = new Color(250, 187, 76);
 	static Color blue = new Color(57, 109, 178);
@@ -55,19 +56,19 @@ public class SportsMatch extends JFrame {
 		contentPane.setBackground(purple);
 		contentPane.setOpaque(true);
 		setContentPane(contentPane);
-		
-		//Card Layout configuration
+
+		// Card Layout configuration
 		setLayout(cardLayout);
 		contentPane.add(mainScreen, "main");
 		contentPane.add(gameScreen, "game");
-		cardLayout.show(contentPane, "main");//Start with main page.
-		
-		//Reload and Pack
+		cardLayout.show(contentPane, "main");// Start with main page.
+
+		// Reload and Pack
 		mainScreen.revalidate();
 		gameScreen.revalidate();
 		this.pack();
 	}
-	
+
 	/**
 	 * Used to swap scenes.
 	 * 
@@ -78,4 +79,3 @@ public class SportsMatch extends JFrame {
 	}
 
 }
-
