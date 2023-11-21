@@ -18,8 +18,8 @@ public class SportsMatch extends JFrame {
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
 	CardLayout cardLayout = new CardLayout();
-	JPanel mainScreen = new MainScreen();
-	JPanel gameScreen = new GameScreen();
+	JPanel mainScreen = new MainScreen(this);//SportsMatch parameter provides cardLayout swap functionality.
+	JPanel gameScreen = new GameScreen(this);
 	
 	//Colors and Fonts
 	static Color purple = new Color(61, 65, 118);
@@ -56,7 +56,15 @@ public class SportsMatch extends JFrame {
 		contentPane.setOpaque(true);
 		setContentPane(contentPane);
 		
-		contentPane.add(gameScreen);
+		//Card Layout configuration
+		setLayout(cardLayout);
+		contentPane.add(mainScreen, "main");
+		contentPane.add(gameScreen, "game");
+		cardLayout.show(contentPane, "main");//Start with main page.
+		
+		//Reload and Pack
+		mainScreen.revalidate();
+		gameScreen.revalidate();
 		this.pack();
 	}
 	

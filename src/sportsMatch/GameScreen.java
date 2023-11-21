@@ -40,7 +40,7 @@ public class GameScreen extends JPanel {
 	/**
 	 * Create the panel.
 	 */
-	public GameScreen() {
+	public GameScreen(SportsMatch frame) {
 		setLayout(new BorderLayout(0, 0));
 		this.setBackground(SportsMatch.purple);
 		this.setOpaque(true);
