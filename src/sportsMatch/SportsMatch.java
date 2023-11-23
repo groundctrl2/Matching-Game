@@ -12,12 +12,13 @@ import javax.swing.border.EmptyBorder;
 /**
  * Sports-themed matching game.
  * 
- * @author Tommy Collier, Jack Bluth, Wesley Elliot
+ * @author Tommy Collier, Jack Bluth, Wesley Elliott
  */
 public class SportsMatch extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
+
 	CardLayout cardLayout = new CardLayout();
 	JPanel gameScreen = new GameScreen(this);
 	JPanel mainScreen = new MainScreen(this, gameScreen);
@@ -70,12 +71,15 @@ public class SportsMatch extends JFrame {
 	}
 
 	/**
-	 * Used to swap scenes.
+	 * Used to swap scenes, and set name from Main Screen
 	 * 
 	 * @param panelName
 	 */
-	public void switchTo(String panelName) {
+	public void switchTo(String panelName, Player player) {
 		cardLayout.show(getContentPane(), panelName);
+		((GameScreen) gameScreen).startTimer();
+		((GameScreen) gameScreen).setPlayer(player);
 	}
+	
 
 }
