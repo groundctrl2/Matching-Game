@@ -5,11 +5,16 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class GameScreen extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private static Timer timer;
+	JLabel playerNameLabel;
+	private Player player = new Player("", 0);
 	int elapsedTime = 0;// Time played in seconds.
 
 	// Front tile faces, each face randomly assigned to two tiles
@@ -22,7 +27,10 @@ public class GameScreen extends JPanel {
 			new ImageIcon(GameScreen.class.getResource("/resources/tile7.png")),
 			new ImageIcon(GameScreen.class.getResource("/resources/tile8.png")),
 			new ImageIcon(GameScreen.class.getResource("/resources/tile9.png")), };
-
+	
+	// allows @Object Random to only pick an index in in tileImgs only twice
+	private Map<Integer, Integer> picksIndexOnlyTwice = new HashMap<>();
+	
 	// Boolean values (Indexes matching tilesBtns array) representing whether a tile
 	// is flipped.
 	private boolean[] tileFlipped = { false, false, false, false, false, false, false, false, false, false, false,
@@ -30,13 +38,13 @@ public class GameScreen extends JPanel {
 
 	// Integer values (Indexes matching tilesBtns array) representing the randomly
 	// assigned tile faces.
-	private List<Integer> tileFaceIndices = new ArrayList<>();
+	private List<Integer> tileFaceIndixes = new ArrayList<>();
 
 	// Tile JButtons
 	private JButton[] tileBtns = { new JButton(), new JButton(), new JButton(), new JButton(), new JButton(),
 			new JButton(), new JButton(), new JButton(), new JButton(), new JButton(), new JButton(), new JButton(),
 			new JButton(), new JButton(), new JButton(), new JButton(), new JButton(), new JButton() };
-
+	
 	/**
 	 * Create the panel.
 	 */
@@ -57,6 +65,10 @@ public class GameScreen extends JPanel {
 		// Timer JLabel
 		JLabel timerLbl = timerLbl();
 		add(timerLbl, BorderLayout.EAST);
+		
+		//players name JLabel
+		playerNameLabel = playerLbl();
+		add(playerNameLabel, BorderLayout.NORTH);
 
 		// Timer updates timerLbl in stopwatch timer format every second.
 		timer = new Timer(1000, new ActionListener() {
@@ -72,8 +84,11 @@ public class GameScreen extends JPanel {
 		// timer.stop();
 		// TODO End timer when all tiles matched.
 
-		// return new Player(playerName, timerLbl.getText());
-		// TODO Create and return new Player object when all tiles matched.
+		// tileMatch();
+		// TODO When two tiles match stay flipped if tiles dont match unflip them
+		
+		//highscoreWriteer();
+		//TODO Display a JOptionPane.DialogBox with player name and highscore when game ends, write the player to an csv file and display it in mainscreen
 	}
 
 	/**
@@ -91,7 +106,7 @@ public class GameScreen extends JPanel {
 		titlePnl.add(titleImg);
 
 		// Text JLabel
-		JLabel titleTxt = new JLabel(" SPORTS MATCH       ");
+		JLabel titleTxt = new JLabel(" SPORTS MATCH " + player.getName());
 		titleTxt.setFont(SportsMatch.font);
 		titleTxt.setForeground(SportsMatch.gold);
 		titleTxt.setBackground(SportsMatch.purple);
@@ -123,6 +138,19 @@ public class GameScreen extends JPanel {
 			btn.setIcon(new ImageIcon(icon.getImage().getScaledInstance(125, 175, Image.SCALE_SMOOTH)));
 			btn.setBackground(SportsMatch.purple);
 			btn.setOpaque(true);
+			btn.addActionListener(new ActionListener() {
+	            @Override
+	            public void actionPerformed(ActionEvent e) {
+	            	Random random = new Random();
+	            	int n;
+	            	do {
+                        n = random.nextInt(9);
+                    } while (picksIndexOnlyTwice.getOrDefault(n, 0) >= 2);
+
+	            	picksIndexOnlyTwice.put(n, picksIndexOnlyTwice.getOrDefault(n, 0) + 1);
+	                btn.setIcon(new ImageIcon(tileImgs[n].getImage().getScaledInstance(125, 175, Image.SCALE_SMOOTH)));
+	            }
+	        });
 
 			constraints.gridx = col;
 			constraints.gridy = row;
@@ -157,4 +185,28 @@ public class GameScreen extends JPanel {
 	public void startTimer() {
 		timer.start();// Start the timer when the program starts.
 	}
+	
+	/**
+	 * default player Label, updated with players name in @method setPlayer
+	 * 
+	 * @return playernameLabel
+	 */
+	private JLabel playerLbl() {
+		JLabel playerNameLabel = new JLabel("Player: " + player.getName());
+		playerNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+	    playerNameLabel.setFont(SportsMatch.font);
+	    playerNameLabel.setForeground(SportsMatch.gold);
+	    playerNameLabel.setBackground(SportsMatch.purple);
+	    playerNameLabel.setOpaque(true);
+	    
+	    return playerNameLabel;
+	}
+	
+	//grabs player from Main Screen input and updates player label text with user input name
+	public void setPlayer(Player player){
+		this.player = player;
+		playerNameLabel.setText("Player: " + player.getName());
+
+	}
+
 }
