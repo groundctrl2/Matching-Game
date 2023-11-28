@@ -4,7 +4,6 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
-
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
@@ -29,6 +28,7 @@ public class SportsMatch extends JFrame {
 	static Color blue = new Color(57, 109, 178);
 	static Color yellow = new Color(255, 247, 102);
 	static Font font = new Font("Arial Black", Font.PLAIN, 50);
+	static Font fontSmall = new Font("Arial Black", Font.PLAIN, 40);
 
 	/**
 	 * Launch the application.
@@ -80,6 +80,5 @@ public class SportsMatch extends JFrame {
 		((GameScreen) gameScreen).startTimer();
 		((GameScreen) gameScreen).setPlayer(player);
 	}
-	
 
 }

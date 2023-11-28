@@ -7,9 +7,8 @@ public class Player {
 
 	String name;
 	int highScore;
-	
-	public Player(String name, int highScore) 
-	{
+
+	public Player(String name, int highScore) {
 		super();
 		this.name = name;
 		this.highScore = highScore;
@@ -33,8 +32,7 @@ public class Player {
 
 	@Override
 	public String toString() {
-		return  name + ": " + highScore;
+		return name + ": " + highScore;
 	}
-	
-	
+
 }
