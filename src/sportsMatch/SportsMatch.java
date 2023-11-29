@@ -79,5 +79,4 @@ public class SportsMatch extends JFrame {
 		((GameScreen) gameScreen).startTimer();
 		((GameScreen) gameScreen).setPlayer(player);
 	}
-
 }

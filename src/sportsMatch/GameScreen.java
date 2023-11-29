@@ -12,6 +12,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 
+/**
+ * The Game/Matching Screen for the matching game
+ * 
+ * @author Tommy Collier, Wesley Elliott
+ */
 public class GameScreen extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private static Timer timer;
@@ -52,53 +57,47 @@ public class GameScreen extends JPanel {
 	 * Create the panel.
 	 */
 	public GameScreen(SportsMatch frame) {
-		
-			setLayout(new BorderLayout(0, 0));
-			this.setBackground(SportsMatch.purple);
-			this.setOpaque(true);
-	
-			// Title JLabel
-			JPanel titlePnl = titlePnl();
-			add(titlePnl, BorderLayout.WEST);
-	
-			// Tiles JPanel setup
-			Collections.shuffle(faceIndexes);// Shuffle tile face indexes (Matched with tileImgs indexes)
-			JPanel tilesPnl = tilesPnl(tileBackImg, frame);
-			add(tilesPnl, BorderLayout.SOUTH);
-	
-			// Timer JLabel
-			JLabel timerLbl = timerLbl();
-			add(timerLbl, BorderLayout.EAST);
-	
-			// players name JLabel
-			playerNameLabel = playerLbl();
-			add(playerNameLabel, BorderLayout.NORTH);
-	
-			// Timer updates timerLbl in stopwatch timer format every second.
-			timer = new Timer(1000, new ActionListener() {
-				@Override
-				public void actionPerformed(ActionEvent e) {
-					elapsedTime--;
-					score-=27;
-					int minutes = elapsedTime / 60;
-					int seconds = elapsedTime % 60;
-					timerLbl.setText(String.format("%02d:%02d ", minutes, seconds));
-					if(elapsedTime == 0)
-					{
-						gameOver(frame);
-					}
-				}
-			});
-			
 
-		// highscoreWriter();
-		// TODO Display a JOptionPane.DialogBox with player name and highscore when game
-		// ends, write the player to an csv file and display it in mainscreen
+		setLayout(new BorderLayout(0, 0));
+		this.setBackground(SportsMatch.purple);
+		this.setOpaque(true);
+
+		// Title JLabel
+		JPanel titlePnl = titlePnl();
+		add(titlePnl, BorderLayout.WEST);
+
+		// Tiles JPanel setup
+		Collections.shuffle(faceIndexes);// Shuffle tile face indexes (Matched with tileImgs indexes)
+		JPanel tilesPnl = tilesPnl(tileBackImg, frame);
+		add(tilesPnl, BorderLayout.SOUTH);
+
+		// Timer JLabel
+		JLabel timerLbl = timerLbl();
+		add(timerLbl, BorderLayout.EAST);
+
+		// players name JLabel
+		playerNameLabel = playerLbl();
+		add(playerNameLabel, BorderLayout.NORTH);
+
+		// Timer updates timerLbl in stopwatch timer format every second.
+		timer = new Timer(1000, new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				elapsedTime--;
+				score -= 27;
+				int minutes = elapsedTime / 60;
+				int seconds = elapsedTime % 60;
+				timerLbl.setText(String.format("%02d:%02d ", minutes, seconds));
+				if (elapsedTime == 0) {
+					gameOver(frame);
+				}
+			}
+		});
 	}
 
-
-	//TITLE AND TIMER HEADING
 	/**
+	 * Title Panel, includes the title, logo, and player name.
+	 * 
 	 * @return titleLbl
 	 */
 	private JPanel titlePnl() {
@@ -122,7 +121,10 @@ public class GameScreen extends JPanel {
 
 		return titlePnl;
 	}
+
 	/**
+	 * Timer JLabel, used by the timer to count down.
+	 * 
 	 * @return timerLbl
 	 */
 	private JLabel timerLbl() {
@@ -133,8 +135,9 @@ public class GameScreen extends JPanel {
 		timerLbl.setOpaque(true);
 		return timerLbl;
 	}
+
 	/**
-	 * default player Label, updated with players name in @method setPlayer
+	 * Default Player JLabel, updated with players name in @method setPlayer
 	 * 
 	 * @return playernameLabel
 	 */
@@ -149,11 +152,9 @@ public class GameScreen extends JPanel {
 		return playerNameLabel;
 	}
 
-	
-	
-	
-	//TILE PANEL METHODS AKA MAIN GAME FUNCTIONALITY
 	/**
+	 * Tiles JPanel, adds all JButtons and formats them with default tile back icon.
+	 * 
 	 * @return tilesPnl
 	 */
 	private JPanel tilesPnl(ImageIcon icon, SportsMatch frame) {
@@ -190,12 +191,13 @@ public class GameScreen extends JPanel {
 
 		return tilesPnl;
 	}
+
 	/**
 	 * Adds an ActionListener to the given JButton tile. When pressed, swaps to corresponding face tile icon, sets
 	 * its flipped value (tileFlipped boolean array) to true, and calls Match method to either reset the incorrect
 	 * match pairing or leave it as a correct match.
 	 * 
-	 * @param JButton         btn
+	 * @param JButton btn
 	 * @param tileFaceIndexes index i
 	 * @return JButton btn with Action Listener
 	 */
@@ -210,6 +212,7 @@ public class GameScreen extends JPanel {
 		});
 		return btn;
 	}
+
 	/**
 	 * Used in JButton action listener, checks if current selection and previous selection are valid matches,
 	 * responding appropriately.
@@ -221,13 +224,14 @@ public class GameScreen extends JPanel {
 		// store the new input.
 		if (firstInput == -1 || firstInput == input) {
 			firstInput = input;
-		// Else If both/either tiles have already been flipped,
-		}else if (tileFlipped[input] || tileFlipped[firstInput]) {
-			if (tileFlipped[firstInput]){// If both are flipped, reset firstInput.
+			// Else If both/either tiles have already been flipped,
+		} else if (tileFlipped[input] || tileFlipped[firstInput]) {
+			if (tileFlipped[firstInput]) {// If both are flipped, reset firstInput.
 				firstInput = input;
-			}else {
+			} else {
 				// If the second selection is, flip the first back.
-				tileBtns[firstInput].setIcon(new ImageIcon(tileBackImg.getImage().getScaledInstance(125, 175, Image.SCALE_SMOOTH)));
+				tileBtns[firstInput]
+						.setIcon(new ImageIcon(tileBackImg.getImage().getScaledInstance(125, 175, Image.SCALE_SMOOTH)));
 			}
 		}
 		// Else If the two chosen tiles are not the same, reset their icons.
@@ -260,93 +264,93 @@ public class GameScreen extends JPanel {
 			tileFlipped[firstInput] = true;
 			tileFlipped[input] = true;
 			firstInput = -1;
-			
-			//checks if all the tiles are flipped
+
+			// checks if all the tiles are flipped
 			allMatched(frame);
 		}
 	}
-	/*
-	 * loops through the tileFlipped index and if all are true calls the Game over method
+
+	/**
+	 * Loops through the tileFlipped index and if all are true calls the @method gameOver
+	 * 
+	 * @param frame
 	 */
 	private void allMatched(SportsMatch frame) {
 		int matched = 0;
-		for(int i = 0; i < tileFlipped.length; i++)
-		{
-			if(tileFlipped[i] == true)
-			{
+		for (int i = 0; i < tileFlipped.length; i++) {
+			if (tileFlipped[i] == true) {
 				matched++;
 			}
-			if(matched == 18)
-			{
+			if (matched == 18) {
 				gameOver(frame);
 			}
 		}
 	}
+
 	/*
-	 * sets player highscore, stops timer, and displays game over message, writes to a csv file
+	 * Sets player highscore, stops timer, and displays game over message, writes to a csv file
+	 * 
+	 * @param frame
 	 */
-	private void gameOver(SportsMatch frame)
-	{
+	private void gameOver(SportsMatch frame) {
 		player.setHighScore(score);
 		timer.stop();
-		int option = JOptionPane.showConfirmDialog(null, "            Game Over!\n" + player.getName() + ", your score was: " + player.getHighScore() + "\nDo you want to play again?",null, JOptionPane.YES_NO_OPTION);
-		
+		int option = JOptionPane
+				.showConfirmDialog(
+						null, "            Game Over!\n" + player.getName() + ", your score was: "
+								+ player.getHighScore() + "\nDo you want to play again?",
+						null, JOptionPane.YES_NO_OPTION);
+
 		String playerData = "\n" + player.getName() + "," + player.getHighScore();
 		try {
 			FileWriter playerScore = new FileWriter("HighScores.csv", true);
 			playerScore.write(playerData);
 			playerScore.close();
-		}catch(Exception e) {
+		} catch (Exception e) {
 			e.getStackTrace();
 		}
-		
-		if(option == JOptionPane.YES_OPTION)
-		{
+
+		if (option == JOptionPane.YES_OPTION) {
 			restartApplication();
-		}else
-		{
+		} else {
 			System.exit(0);
 		}
 	}
+
 	/*
-	 * automatically exits and restarts application to refresh the highscore list
+	 * Automatically exits and restarts application (to refresh the highscore list).
 	 */
 	private static void restartApplication() {
-	    try {
-	        String javaCommand = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
-	        String classpath = System.getProperty("java.class.path");
-	        String className = SportsMatch.class.getName();
+		try {
+			String javaCommand = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
+			String classpath = System.getProperty("java.class.path");
+			String className = SportsMatch.class.getName();
 
-	        // Build the command to restart the program
-	        List<String> command = new ArrayList<>();
-	        command.add(javaCommand);
-	        command.add("-cp");
-	        command.add(classpath);
-	        command.add(className);
+			// Build the command to restart the program
+			List<String> command = new ArrayList<>();
+			command.add(javaCommand);
+			command.add("-cp");
+			command.add(classpath);
+			command.add(className);
 
-	        // Start a new process for the restarted program
-	        ProcessBuilder processBuilder = new ProcessBuilder(command);
-	        processBuilder.start();
+			// Start a new process for the restarted program
+			ProcessBuilder processBuilder = new ProcessBuilder(command);
+			processBuilder.start();
 
-	        // Exit the current instance of the program
-	        System.exit(0);
-	    } catch (IOException e) {
-	        e.printStackTrace();
-	    }
+			// Exit the current instance of the program
+			System.exit(0);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
-
-	
-	
-	
-	//THESE METHODS ARE FOR TRANSITIONING INFO FROM SCREEN TO THE NEXT DONT CHANGE
 	/**
-	 * Starts the timer. Used in SportsMatch when contentPane swaps to GameScreen.
+	 * Starts the timer. Used in @class SportsMatch when contentPane swaps to @class GameScreen.
 	 */
 	public void startTimer() {
 		timer.start();// Start the timer when the program starts.
 	}
-	
+
 	/**
 	 * Grabs player from Main Screen input and updates player label text with user input name.
 	 * 
@@ -357,6 +361,5 @@ public class GameScreen extends JPanel {
 		playerNameLabel.setText("Player: " + player.getName());
 
 	}
-
 
 }

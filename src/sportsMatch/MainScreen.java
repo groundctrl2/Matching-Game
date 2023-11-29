@@ -9,6 +9,11 @@ import java.util.*;
 import javax.swing.border.*;
 import javax.swing.table.DefaultTableModel;
 
+/**
+ * The Main/Start Screen for the matching game.
+ * 
+ * @author Tommy Collier, Wesley Elliott
+ */
 public class MainScreen extends JPanel {
 
 	private static final long serialVersionUID = 1L;
@@ -27,22 +32,22 @@ public class MainScreen extends JPanel {
 		JPanel titlePnl = titlePnl();
 		this.add(titlePnl);
 
-		// Start JButton
-		// when clicked creates player object, with name from text field and high score
-		// set at zero
+		// When Start JButton clicked, creates player object, with name from text field and high score set at zero.
 		JPanel playPnl = playPnl(frame, gameScreen);
 		this.add(playPnl);
 
 		// HighScore Display
 		JPanel highScore = highScore();
 		this.add(highScore);
-
 	}
 
 	/**
+	 * Title JPanel, includes the game name and trophy logo.
+	 * 
 	 * @return titlePnl
 	 */
 	private JPanel titlePnl() {
+
 		JPanel titlePnl = new JPanel();
 		titlePnl.setBorder(new EtchedBorder(EtchedBorder.LOWERED, SportsMatch.blue, SportsMatch.purple));
 		titlePnl.setBackground(SportsMatch.purple);
@@ -74,11 +79,14 @@ public class MainScreen extends JPanel {
 	}
 
 	/**
+	 * Play JPanel, includes the name textfield and the play button.
+	 * 
 	 * @param frame
 	 * @param gameScreen
 	 * @return playPnl
 	 */
 	private JPanel playPnl(SportsMatch frame, JPanel gameScreen) {
+
 		JPanel playPnl = new JPanel();
 		playPnl.setBounds(10, 506, 415, 217);
 		playPnl.setBorder(new EtchedBorder(EtchedBorder.LOWERED, SportsMatch.blue, SportsMatch.purple));
@@ -93,6 +101,7 @@ public class MainScreen extends JPanel {
 		nameFld.setBounds(10, 11, 395, 62);
 		playPnl.add(nameFld);
 
+		// Name field functionality.
 		nameFld.addFocusListener(new FocusListener() {
 			@Override
 			public void focusGained(FocusEvent e) {
@@ -114,6 +123,8 @@ public class MainScreen extends JPanel {
 		startBtn.setBackground(SportsMatch.purple);
 		startBtn.setFont(SportsMatch.fontSmall);
 		startBtn.setBounds(10, 84, 395, 122);
+
+		// Play button functionality.
 		startBtn.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				String name = nameFld.getText();
@@ -126,14 +137,18 @@ public class MainScreen extends JPanel {
 
 			}
 		});
+
 		playPnl.add(startBtn);
 		return playPnl;
 	}
 
 	/**
+	 * Highscore JPanel, works based
+	 * 
 	 * @return highScore
 	 */
 	private JPanel highScore() {
+
 		JPanel highScore = new JPanel();
 		highScore.setBorder(new LineBorder(SportsMatch.purple, 5, true));
 		highScore.setBackground(SportsMatch.blue);
@@ -150,42 +165,44 @@ public class MainScreen extends JPanel {
 		highLbl.setOpaque(true);
 		highScore.add(highLbl);
 
-		
 		DefaultTableModel tableModel = new DefaultTableModel();
-	    tableModel.addColumn("Player");
-	    tableModel.addColumn("Score");
-	    ArrayList<String[]> scoresList = new ArrayList<>();
-	    File file = new File("HighScores.csv");
-	    try (Scanner reader = new Scanner(file)) {
-	        while (reader.hasNextLine()) {
-	            String line = reader.nextLine();
-	            String[] parts = line.split(",");
-	            if (parts.length == 2) {
-	                scoresList.add(parts);
-	            }
-	        }
-	    }catch(NullPointerException e)
-	    {
-	    	e.printStackTrace();
-	    } catch (FileNotFoundException e1) {
+		tableModel.addColumn("Player");
+		tableModel.addColumn("Score");
+
+		// Score functionality.
+		ArrayList<String[]> scoresList = new ArrayList<>();
+		File file = new File("HighScores.csv");
+
+		try (Scanner reader = new Scanner(file)) { // Score reading.
+			while (reader.hasNextLine()) {
+				String line = reader.nextLine();
+				String[] parts = line.split(",");
+				if (parts.length == 2) {
+					scoresList.add(parts);
+				}
+			}
+		} catch (NullPointerException e) {
+			e.printStackTrace();
+		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		}
-	    
-	    scoresList.sort((a, b) -> Integer.compare(Integer.parseInt(b[1]), Integer.parseInt(a[1])));
 
-	    for (String[] row : scoresList) {
-	        tableModel.addRow(row);
-	    }
-	    
-	    JTable table = new JTable(tableModel);
-	    table.setForeground(new Color(255, 255, 255));
-	    table.setFont(new Font("Times New Roman", Font.BOLD, 16));
-	    table.setBackground(SportsMatch.purple);
-	    table.setEnabled(false);
-	    table.setBounds(10, 131, 375, 570);
+		scoresList.sort((a, b) -> Integer.compare(Integer.parseInt(b[1]), Integer.parseInt(a[1]))); // Sort scores.
 
-	    highScore.add(table);
+		for (String[] row : scoresList) { // Add scores.
+			tableModel.addRow(row);
+		}
 
-	    return highScore;
+		JTable table = new JTable(tableModel);
+		table.setForeground(SportsMatch.gold);
+		table.setFont(new Font("Arial Black", Font.PLAIN, 25));
+		table.setRowHeight(40);
+		table.setBackground(SportsMatch.purple);
+		table.setEnabled(false);
+		table.setBounds(10, 131, 375, 570);
+
+		highScore.add(table);
+
+		return highScore;
 	}
 }

@@ -1,7 +1,9 @@
 package sportsMatch;
 
 /**
- * Implementing basic player object
+ * Implements a basic Player object.
+ * 
+ * @author Tommy Collier, Wesley Elliott
  */
 public class Player {
 
@@ -9,7 +11,6 @@ public class Player {
 	int highScore;
 
 	public Player(String name, int highScore) {
-		super();
 		this.name = name;
 		this.highScore = highScore;
 	}
