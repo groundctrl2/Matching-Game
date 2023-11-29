@@ -17,7 +17,6 @@ public class SportsMatch extends JFrame {
 
 	private static final long serialVersionUID = 1L;
 	private JPanel contentPane;
-
 	CardLayout cardLayout = new CardLayout();
 	JPanel gameScreen = new GameScreen(this);
 	JPanel mainScreen = new MainScreen(this, gameScreen);
