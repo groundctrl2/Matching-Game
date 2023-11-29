@@ -3,7 +3,11 @@ package sportsMatch;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.util.*;
 import javax.swing.border.*;
+import javax.swing.table.DefaultTableModel;
 
 public class MainScreen extends JPanel {
 
@@ -146,12 +150,42 @@ public class MainScreen extends JPanel {
 		highLbl.setOpaque(true);
 		highScore.add(highLbl);
 
-		JList list = new JList();
-		list.setValueIsAdjusting(true);
-		list.setBorder(new LineBorder(SportsMatch.purple, 5));
-		list.setBackground(SportsMatch.blue);
-		list.setBounds(10, 131, 375, 570);
-		highScore.add(list);
-		return highScore;
+		
+		DefaultTableModel tableModel = new DefaultTableModel();
+	    tableModel.addColumn("Player");
+	    tableModel.addColumn("Score");
+	    ArrayList<String[]> scoresList = new ArrayList<>();
+	    File file = new File("HighScores.csv");
+	    try (Scanner reader = new Scanner(file)) {
+	        while (reader.hasNextLine()) {
+	            String line = reader.nextLine();
+	            String[] parts = line.split(",");
+	            if (parts.length == 2) {
+	                scoresList.add(parts);
+	            }
+	        }
+	    }catch(NullPointerException e)
+	    {
+	    	e.printStackTrace();
+	    } catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		}
+	    
+	    scoresList.sort((a, b) -> Integer.compare(Integer.parseInt(b[1]), Integer.parseInt(a[1])));
+
+	    for (String[] row : scoresList) {
+	        tableModel.addRow(row);
+	    }
+	    
+	    JTable table = new JTable(tableModel);
+	    table.setForeground(new Color(255, 255, 255));
+	    table.setFont(new Font("Times New Roman", Font.BOLD, 16));
+	    table.setBackground(SportsMatch.purple);
+	    table.setEnabled(false);
+	    table.setBounds(10, 131, 375, 570);
+
+	    highScore.add(table);
+
+	    return highScore;
 	}
 }

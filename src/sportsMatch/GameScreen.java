@@ -4,6 +4,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,7 +15,8 @@ import java.util.Collections;
 public class GameScreen extends JPanel {
 	private static final long serialVersionUID = 1L;
 	private static Timer timer;
-	int elapsedTime = 0;// Time played in seconds.
+	int elapsedTime = 60;// Time played in seconds.
+	int score = 0;
 	JLabel playerNameLabel;
 	private Player player = new Player("", 0);
 	int firstInput = -1;
@@ -48,46 +52,52 @@ public class GameScreen extends JPanel {
 	 * Create the panel.
 	 */
 	public GameScreen(SportsMatch frame) {
-		setLayout(new BorderLayout(0, 0));
-		this.setBackground(SportsMatch.purple);
-		this.setOpaque(true);
+		
+			setLayout(new BorderLayout(0, 0));
+			this.setBackground(SportsMatch.purple);
+			this.setOpaque(true);
+	
+			// Title JLabel
+			JPanel titlePnl = titlePnl();
+			add(titlePnl, BorderLayout.WEST);
+	
+			// Tiles JPanel setup
+			Collections.shuffle(faceIndexes);// Shuffle tile face indexes (Matched with tileImgs indexes)
+			JPanel tilesPnl = tilesPnl(tileBackImg, frame);
+			add(tilesPnl, BorderLayout.SOUTH);
+	
+			// Timer JLabel
+			JLabel timerLbl = timerLbl();
+			add(timerLbl, BorderLayout.EAST);
+	
+			// players name JLabel
+			playerNameLabel = playerLbl();
+			add(playerNameLabel, BorderLayout.NORTH);
+	
+			// Timer updates timerLbl in stopwatch timer format every second.
+			timer = new Timer(1000, new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					elapsedTime--;
+					score-=27;
+					int minutes = elapsedTime / 60;
+					int seconds = elapsedTime % 60;
+					timerLbl.setText(String.format("%02d:%02d ", minutes, seconds));
+					if(elapsedTime == 0)
+					{
+						gameOver(frame);
+					}
+				}
+			});
+			
 
-		// Title JLabel
-		JPanel titlePnl = titlePnl();
-		add(titlePnl, BorderLayout.WEST);
-
-		// Tiles JPanel setup
-		Collections.shuffle(faceIndexes);// Shuffle tile face indexes (Matched with tileImgs indexes)
-		JPanel tilesPnl = tilesPnl(tileBackImg);
-		add(tilesPnl, BorderLayout.SOUTH);
-
-		// Timer JLabel
-		JLabel timerLbl = timerLbl();
-		add(timerLbl, BorderLayout.EAST);
-
-		// players name JLabel
-		playerNameLabel = playerLbl();
-		add(playerNameLabel, BorderLayout.NORTH);
-
-		// Timer updates timerLbl in stopwatch timer format every second.
-		timer = new Timer(1000, new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				elapsedTime++;
-				int minutes = elapsedTime / 60;
-				int seconds = elapsedTime % 60;
-				timerLbl.setText(String.format("%02d:%02d ", minutes, seconds));
-			}
-		});
-
-		// timer.stop();
-		// TODO End timer when all tiles matched.
-
-		// highscoreWriteer();
+		// highscoreWriter();
 		// TODO Display a JOptionPane.DialogBox with player name and highscore when game
 		// ends, write the player to an csv file and display it in mainscreen
 	}
 
+
+	//TITLE AND TIMER HEADING
 	/**
 	 * @return titleLbl
 	 */
@@ -112,11 +122,41 @@ public class GameScreen extends JPanel {
 
 		return titlePnl;
 	}
+	/**
+	 * @return timerLbl
+	 */
+	private JLabel timerLbl() {
+		JLabel timerLbl = new JLabel("01:00 ");
+		timerLbl.setFont(SportsMatch.font);
+		timerLbl.setForeground(SportsMatch.gold);
+		timerLbl.setBackground(SportsMatch.purple);
+		timerLbl.setOpaque(true);
+		return timerLbl;
+	}
+	/**
+	 * default player Label, updated with players name in @method setPlayer
+	 * 
+	 * @return playernameLabel
+	 */
+	private JLabel playerLbl() {
+		JLabel playerNameLabel = new JLabel("Player: " + player.getName());
+		playerNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		playerNameLabel.setFont(SportsMatch.fontSmall);
+		playerNameLabel.setForeground(SportsMatch.gold);
+		playerNameLabel.setBackground(SportsMatch.purple);
+		playerNameLabel.setOpaque(true);
 
+		return playerNameLabel;
+	}
+
+	
+	
+	
+	//TILE PANEL METHODS AKA MAIN GAME FUNCTIONALITY
 	/**
 	 * @return tilesPnl
 	 */
-	private JPanel tilesPnl(ImageIcon icon) {
+	private JPanel tilesPnl(ImageIcon icon, SportsMatch frame) {
 		JPanel tilesPnl = new JPanel();
 		tilesPnl.setBackground(SportsMatch.purple);
 		tilesPnl.setLayout(new GridBagLayout());
@@ -135,7 +175,7 @@ public class GameScreen extends JPanel {
 			tileBtns[i].setIcon(new ImageIcon(icon.getImage().getScaledInstance(125, 175, Image.SCALE_SMOOTH)));
 			tileBtns[i].setBackground(SportsMatch.purple);
 			tileBtns[i].setOpaque(true);
-			setActionListener(tileBtns[i], i);// Needed because icon can't be changed by index otherwise.
+			setActionListener(tileBtns[i], i, frame);// Needed because icon can't be changed by index otherwise.
 
 			constraints.gridx = col;
 			constraints.gridy = row;
@@ -150,7 +190,6 @@ public class GameScreen extends JPanel {
 
 		return tilesPnl;
 	}
-
 	/**
 	 * Adds an ActionListener to the given JButton tile. When pressed, swaps to corresponding face tile icon, sets
 	 * its flipped value (tileFlipped boolean array) to true, and calls Match method to either reset the incorrect
@@ -160,82 +199,36 @@ public class GameScreen extends JPanel {
 	 * @param tileFaceIndexes index i
 	 * @return JButton btn with Action Listener
 	 */
-	private JButton setActionListener(JButton btn, int index) {
+	private JButton setActionListener(JButton btn, int index, SportsMatch frame) {
 		btn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				btn.setIcon(new ImageIcon(
 						tileImgs[faceIndexes.get(index)].getImage().getScaledInstance(125, 175, Image.SCALE_SMOOTH)));
-				match(index); // Check for match and respond if appropriate.
+				match(index, frame); // Check for match and respond if appropriate.
 			}
 		});
 		return btn;
 	}
-
-	/**
-	 * @return timerLbl
-	 */
-	private JLabel timerLbl() {
-		JLabel timerLbl = new JLabel("00:00 ");
-		timerLbl.setFont(SportsMatch.font);
-		timerLbl.setForeground(SportsMatch.gold);
-		timerLbl.setBackground(SportsMatch.purple);
-		timerLbl.setOpaque(true);
-		return timerLbl;
-	}
-
-	/**
-	 * Starts the timer. Used in SportsMatch when contentPane swaps to GameScreen.
-	 */
-	public void startTimer() {
-		timer.start();// Start the timer when the program starts.
-	}
-
-	/**
-	 * default player Label, updated with players name in @method setPlayer
-	 * 
-	 * @return playernameLabel
-	 */
-	private JLabel playerLbl() {
-		JLabel playerNameLabel = new JLabel("Player: " + player.getName());
-		playerNameLabel.setHorizontalAlignment(SwingConstants.CENTER);
-		playerNameLabel.setFont(SportsMatch.fontSmall);
-		playerNameLabel.setForeground(SportsMatch.gold);
-		playerNameLabel.setBackground(SportsMatch.purple);
-		playerNameLabel.setOpaque(true);
-
-		return playerNameLabel;
-	}
-
-	/**
-	 * Grabs player from Main Screen input and updates player label text with user input name.
-	 * 
-	 * @param player
-	 */
-	public void setPlayer(Player player) {
-		this.player = player;
-		playerNameLabel.setText("Player: " + player.getName());
-
-	}
-
 	/**
 	 * Used in JButton action listener, checks if current selection and previous selection are valid matches,
 	 * responding appropriately.
 	 * 
 	 * @param Jbutton index selection input
 	 */
-	public void match(int input) {
+	public void match(int input, SportsMatch frame) {
 		// If this is the first tile in a pairing chosen, or the previously selected tile is the same as this one,
 		// store the new input.
-		if (firstInput == -1 || firstInput == input)
+		if (firstInput == -1 || firstInput == input) {
 			firstInput = input;
 		// Else If both/either tiles have already been flipped,
-		else if (tileFlipped[input] || tileFlipped[firstInput]) {
-			if (tileFlipped[firstInput])// If both are flipped, reset firstInput.
+		}else if (tileFlipped[input] || tileFlipped[firstInput]) {
+			if (tileFlipped[firstInput]){// If both are flipped, reset firstInput.
 				firstInput = input;
-			else // If the second selection is, flip the first back.
-				tileBtns[firstInput]
-						.setIcon(new ImageIcon(tileBackImg.getImage().getScaledInstance(125, 175, Image.SCALE_SMOOTH)));
+			}else {
+				// If the second selection is, flip the first back.
+				tileBtns[firstInput].setIcon(new ImageIcon(tileBackImg.getImage().getScaledInstance(125, 175, Image.SCALE_SMOOTH)));
+			}
 		}
 		// Else If the two chosen tiles are not the same, reset their icons.
 		else if (faceIndexes.get(firstInput) != faceIndexes.get(input)) {
@@ -253,6 +246,7 @@ public class GameScreen extends JPanel {
 					tileBtns[input].setIcon(
 							new ImageIcon(tileBackImg.getImage().getScaledInstance(125, 175, Image.SCALE_SMOOTH)));
 					firstInput = -1; // Reset the first input so another pair can be found.
+					score -= 42;
 				}
 			};
 
@@ -262,9 +256,107 @@ public class GameScreen extends JPanel {
 		}
 		// Else they're a match and we can reset for the next match.
 		else {
+			score += 739;
 			tileFlipped[firstInput] = true;
 			tileFlipped[input] = true;
 			firstInput = -1;
+			
+			//checks if all the tiles are flipped
+			allMatched(frame);
 		}
 	}
+	/*
+	 * loops through the tileFlipped index and if all are true calls the Game over method
+	 */
+	private void allMatched(SportsMatch frame) {
+		int matched = 0;
+		for(int i = 0; i < tileFlipped.length; i++)
+		{
+			if(tileFlipped[i] == true)
+			{
+				matched++;
+			}
+			if(matched == 18)
+			{
+				gameOver(frame);
+			}
+		}
+	}
+	/*
+	 * sets player highscore, stops timer, and displays game over message, writes to a csv file
+	 */
+	private void gameOver(SportsMatch frame)
+	{
+		player.setHighScore(score);
+		timer.stop();
+		int option = JOptionPane.showConfirmDialog(null, "            Game Over!\n" + player.getName() + ", your score was: " + player.getHighScore() + "\nDo you want to play again?",null, JOptionPane.YES_NO_OPTION);
+		
+		String playerData = "\n" + player.getName() + "," + player.getHighScore();
+		try {
+			FileWriter playerScore = new FileWriter("HighScores.csv", true);
+			playerScore.write(playerData);
+			playerScore.close();
+		}catch(Exception e) {
+			e.getStackTrace();
+		}
+		
+		if(option == JOptionPane.YES_OPTION)
+		{
+			restartApplication();
+		}else
+		{
+			System.exit(0);
+		}
+	}
+	/*
+	 * automatically exits and restarts application to refresh the highscore list
+	 */
+	private static void restartApplication() {
+	    try {
+	        String javaCommand = System.getProperty("java.home") + File.separator + "bin" + File.separator + "java";
+	        String classpath = System.getProperty("java.class.path");
+	        String className = SportsMatch.class.getName();
+
+	        // Build the command to restart the program
+	        List<String> command = new ArrayList<>();
+	        command.add(javaCommand);
+	        command.add("-cp");
+	        command.add(classpath);
+	        command.add(className);
+
+	        // Start a new process for the restarted program
+	        ProcessBuilder processBuilder = new ProcessBuilder(command);
+	        processBuilder.start();
+
+	        // Exit the current instance of the program
+	        System.exit(0);
+	    } catch (IOException e) {
+	        e.printStackTrace();
+	    }
+	}
+
+
+	
+	
+	
+	//THESE METHODS ARE FOR TRANSITIONING INFO FROM SCREEN TO THE NEXT DONT CHANGE
+	/**
+	 * Starts the timer. Used in SportsMatch when contentPane swaps to GameScreen.
+	 */
+	public void startTimer() {
+		timer.start();// Start the timer when the program starts.
+	}
+	
+	/**
+	 * Grabs player from Main Screen input and updates player label text with user input name.
+	 * 
+	 * @param player
+	 */
+	public void setPlayer(Player player) {
+		this.player = player;
+		playerNameLabel.setText("Player: " + player.getName());
+
+	}
+
+
 }
